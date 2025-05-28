@@ -1,52 +1,99 @@
-# Prerequisites
-*.d
-
-# Object files
+# Compiled object files
 *.o
-*.ko
 *.obj
 *.elf
-
-# Linker output
-*.ilk
-*.map
-*.exp
-
-# Precompiled Headers
-*.gch
-*.pch
+*.axf
+*.out
 
 # Libraries
-*.lib
 *.a
-*.la
-*.lo
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
+*.lib
 
 # Executables
 *.exe
-*.out
-*.app
-*.i*86
-*.x86_64
+*.bin
 *.hex
+*.srec
+*.map
 
-# Debug files
-*.dSYM/
-*.su
-*.idb
-*.pdb
+# Dependency files
+*.d
 
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
+# Build directories
+build/
+Build/
+GNU ARM v12.2.1 - Debug/
+debug/
+Debug/
+release/
+Release/
+**/build-*/ # For CMake or other build systems that create build-foo directories
+
+# Simplicity Studio / Eclipse specific files
+.project
+.cproject
+.settings/
+*.launch
+*.sls
+*.hwconf
+*.isc
+*.pdm
+*.bak
+*.sav
+*.~cfg
+*.~project
+*.~cproject
+*.~h
+*.~c
+*.~s
+*.~asm
+
+# JLink files
+JLinkLog.txt
+JLinkConfig.ini
+
+# Keil specific files (if you ever cross-compile or use Keil)
+*.uvproj
+*.uvopt
+*.uvgui.*
+*.uvmpw
+*.Opt
+*.plg
+*.dep
+Objects/
+Listings/
+DebugConfig/
+JLinkSettings.ini
+
+# IAR specific files (if you ever cross-compile or use IAR)
+settings/
+debug/
+config/
+output/
+*.ewd
+*.ewp
+*.eww
+*.proj
+*.dni
+*.xcl
+
+# macOS specific
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# User-specific files (often good to ignore)
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*~
