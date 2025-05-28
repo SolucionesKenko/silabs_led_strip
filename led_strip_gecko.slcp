@@ -1,0 +1,45 @@
+# Silicon Labs Project Configuration Tools: slcp, v0, Component selection file.
+project_name: led_strip_gecko
+label: led_strip_gecko
+description: |
+  This example project uses the PWM driver that uses a TIMER to gradually adjust the intensity of an LED up and down.
+category: Example|Platform
+filter:
+- name: Device Type
+  value: [SoC]
+- name: MCU
+  value: [32-bit MCU]
+- name: Project Difficulty
+  value: [Beginner]
+package: platform
+quality: production
+readme:
+- {path: readme.md}
+- {path: readme.md}
+source:
+- {path: app.c}
+- {path: main.c}
+- {path: blink_pwm_app.c}
+tag: ['hardware:component:led:1+']
+include:
+- path: .
+  file_list:
+  - {path: app.h}
+  - {path: blink_pwm_app.h}
+sdk: {id: gecko_sdk, version: 4.4.6}
+toolchain_settings: []
+component:
+- {id: EFR32BG22C224F512IM40}
+- {id: brd4184a_a01}
+- {id: device_init}
+- {id: emlib_ldma}
+- instance: [led0]
+  id: pwm
+- {id: sl_system}
+- {id: sleeptimer}
+define:
+- {name: DEBUG_EFM}
+ui_hints:
+  highlight:
+  - {path: readme.md, focus: true}
+

@@ -1,0 +1,11 @@
+#CRC Codes for initially generated config files -- do not modify!
+emlib_core_debug_config.h=1524820012
+sl_board_control_config.h=-296479356
+sl_device_init_dcdc_config.h=-1223674373
+sl_device_init_emu_config.h=1238190016
+sl_device_init_hfxo_config.h=1149982166
+sl_device_init_lfxo_config.h=138206931
+sl_memory_config.h=-995392215
+sl_mx25_flash_shutdown_usart_config.h=1404588998
+sl_pwm_init_led0_config.h=-95285542
+sl_sleeptimer_config.h=847044378
