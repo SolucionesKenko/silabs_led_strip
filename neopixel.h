@@ -24,11 +24,11 @@
 #elif (NEOPIXEL_TYPE == NEOPIXEL_TYPE_SK6812)
     #define NUM_BPP (4) // SK6812
 #endif
-#define NUM_LEDS (11)
+#define NUM_LEDS (10)
 #define NUM_BITS (8)
 #define NUM_BYTES (NUM_BPP)
 #define NUM_STRIPS (1)
-#define WR_BUF_LEN (NUM_BPP * NUM_LEDS * NUM_BITS)
+#define WR_BUF_LEN ((NUM_BPP * NUM_LEDS * NUM_BITS) + 1) // +1 for a final zero-duty-cycle pulse
 
 enum neopixel_strip_id {
     NEOPIXEL_STRIP_ID_0,
