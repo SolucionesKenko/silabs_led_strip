@@ -21,7 +21,7 @@ void LDMA_IRQHandler(void)
   {
       //TIMER_Enable(TIMER0, false);
   }
-  if(pending & LDMA_IF_DONE1)
+  if(pending & (1 << DMA_CONFIG_DMA_CHANNEL) )
   {
      neopixel_ldma_irq_handler();
   }
@@ -37,6 +37,7 @@ void dma_init_controller(void)
 
   // Initialize the LDMA controller with default settings
   LDMA_Init_t ldmaInit = LDMA_INIT_DEFAULT;
+  ldmaInit.ldmaInitIrqPriority = 0;
   LDMA_Init(&ldmaInit);
 
   // Enable LDMA IRQ in NVIC. Note: Specific channel interrupts (like DONE0 or ERROR)
