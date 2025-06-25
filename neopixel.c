@@ -20,6 +20,7 @@
 #include "em_timer.h" // For TIMER_TypeDef, TIMER0
 #include "em_gpio.h"
 #include "em_cmu.h"
+#include <stdbool.h>
 
 #include "dma_config.h"
 
@@ -36,7 +37,7 @@ LDMA_Descriptor_t neopixel_dma_desc_link;
  *****************************************************************************/
 static void neopixel_hal_init_gpio(void)
 {
-  // Configure PA6 as Push-Pull (assuming PA6 is the Neopixel data pin)
+  // Configure PA6 as Push-Pull (assuming PA8 is the Neopixel data pin)
   // Ensure this pin matches your hardware setup.
   GPIO_PinModeSet(gpioPortA, 8, gpioModePushPull, 0);
 }
@@ -69,7 +70,7 @@ static void neopixel_hal_init_timer(void)
 
   TIMER_Init(TIMER0, &timerInit);
 
-  // Route CC0 output to PA6 (Neopixel data pin)
+  // Route CC0 output to PA8 (Neopixel data pin)
   GPIO->TIMERROUTE[0].ROUTEEN  = GPIO_TIMER_ROUTEEN_CC0PEN;
   GPIO->TIMERROUTE[0].CC0ROUTE = (gpioPortA << _GPIO_TIMER_CC0ROUTE_PORT_SHIFT)
                                | (8 << _GPIO_TIMER_CC0ROUTE_PIN_SHIFT);
@@ -191,7 +192,7 @@ void neopixel_update(neopixel_t *neopixel, uint32_t pwm_top_value) {
     volatile uint32_t wr_buf_idx = 0;
 
     uint32_t expected_buf_len = NUM_LEDS * NUM_BPP * NUM_BITS;
-    if (WR_BUF_LEN < expected_buf_len) {
+    if (WR_BUF_LEN < (expected_buf_len + 1)) {
         // Error: Buffer is too small.
         return;
     }
@@ -209,9 +210,6 @@ void neopixel_update(neopixel_t *neopixel, uint32_t pwm_top_value) {
         for (uint8_t comp_idx = 0; comp_idx < NUM_BPP; comp_idx++) {
             uint8_t current_byte = color_components[comp_idx];
             for (int bit_idx = 7; bit_idx >= 0; bit_idx--) {
-                 if (wr_buf_idx >= WR_BUF_LEN) {
-                    return;
-                 }
                 uint8_t bit_is_set = (current_byte >> bit_idx) & 0x01;
                 uint32_t pwm_duty_raw = (uint32_t)(bit_is_set ? PWM_HI : PWM_LO);
                 // Calculate actual duty cycle value for TIMER CCVB based on top value and desired percentage
@@ -219,6 +217,9 @@ void neopixel_update(neopixel_t *neopixel, uint32_t pwm_top_value) {
             }
         }
     }
+
+    // Add final zero-duty-cycle pulse to ensure line goes low
+    neopixel->wr_buf[wr_buf_idx] = 0;
 }
 
 /**
@@ -229,27 +230,24 @@ void neopixel_update(neopixel_t *neopixel, uint32_t pwm_top_value) {
  */
 void neopixel_init_dma_transfer(neopixel_t *neopixel, void *timer_cc_reg) { // Renamed param for clarity
     if (neopixel == NULL || timer_cc_reg == NULL) return;
+    TIMER_Enable(TIMER0, true);
+
+    GPIO_PinOutSet(gpioPortA, 7);
 
     LDMA_TransferCfg_t periTransferTx = LDMA_TRANSFER_CFG_PERIPHERAL(ldmaPeripheralSignal_TIMER0_CC0);
 
-    // WR_BUF_LEN is in terms of uint32_t elements. Each element is one PWM duty cycle value.
-    // The number of transfers is (WR_BUF_LEN - 1) if linking to self for single descriptor continuous transfer.
-    // However, for Neopixels, the transfer is finite (send all bits, then stop).
-    // So, link to 0 (disable link) and transfer WR_BUF_LEN items.
-    LDMA_Descriptor_t xfer = LDMA_DESCRIPTOR_LINKREL_M2P_BYTE(
+    // The descriptor macro handles subtracting 1 from the count, so we pass WR_BUF_LEN directly.
+    LDMA_Descriptor_t xfer = LDMA_DESCRIPTOR_SINGLE_M2P_BYTE(
                                         neopixel->wr_buf,    // Source: word-aligned buffer
-                                        timer_cc_reg,        // Destination: word-aligned peripheral reg (e.g. &TIMER0->CC[0].CCVB)
-                                        (WR_BUF_LEN - 1),
-                                        0 );         // Number of words to transfer
+                                        timer_cc_reg,        // Destination: word-aligned peripheral reg
+                                        WR_BUF_LEN);         // Number of transfers
 
     neopixel_dma_desc_link = xfer;
+
+    // The descriptor macro for BYTE transfers sets the size to byte, so we must override it to word.
     neopixel_dma_desc_link.xfer.size = ldmaCtrlSizeWord;
     neopixel_dma_desc_link.xfer.ignoreSrec = 0;
-    neopixel_dma_desc_link.xfer.doneIfs = 1; // Interrupt when doner
-
-    // Enable LDMA IRQ in NVIC
-    NVIC_ClearPendingIRQ(LDMA_IRQn);
-    NVIC_EnableIRQ(LDMA_IRQn);
+    neopixel_dma_desc_link.xfer.doneIfs = 1; // Interrupt when done
 
     // Channel 0 is assumed for Neopixel DMA.
     LDMA_IntEnable(LDMA_IEN_CHDONE_DEFAULT | LDMA_IEN_ERROR); // Enable DONE0 and ERROR interrupts for channel 0
