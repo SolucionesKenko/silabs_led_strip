@@ -17,8 +17,14 @@ typedef struct {
     uint32_t stopbits; // 1 or 2
 } usart_drv_config_t;
 
+// Callback type for RX interrupt
+typedef void (*usart_drv_rx_cb_t)(uint8_t data);
+
 // Initialize a USART in async (UART) mode
 void usart_drv_init_async(USART_TypeDef *usart, const usart_drv_config_t *cfg);
+
+// Enable RX interrupt and set callback (optional, per USART)
+void usart_drv_enable_rx_interrupt(USART_TypeDef *usart, usart_drv_rx_cb_t cb);
 
 // Transmit a single byte (blocking)
 void usart_drv_tx(USART_TypeDef *usart, uint8_t data);

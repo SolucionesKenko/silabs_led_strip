@@ -52,6 +52,10 @@ static usart_drv_config_t uart_cfg = {
 #define USART1_RX_PORT   gpioPortB
 #define USART1_RX_PIN    1
 
+static void app_usart1_rx_callback(uint8_t data) {
+  usart_drv_tx(USART0, data); // Print received data to debug port
+}
+
 static void uart_setup(void)
 {
     // Enable clocks for USART0 and USART1
@@ -76,27 +80,23 @@ static void uart_setup(void)
     // Initialize both UARTs
     usart_drv_init_async(USART0, &uart_cfg);
     usart_drv_init_async(USART1, &uart_cfg);
+
+    // Enable RX interrupt for USART1
+    usart_drv_enable_rx_interrupt(USART1, app_usart1_rx_callback);
 }
 
 static void uart_run(void)
 {
-    // Example: send a test byte on USART1
-    static bool sent = false;
-    if (!sent) {
-        usart_drv_hello(USART0);
-        usart_drv_hello(USART1);
-        sent = true;
-    }
-    // Print received data from USART1 to USART0 (debug)
-    if (USART1->STATUS & USART_STATUS_RXDATAV) {
-      uint8_t data = usart_drv_rx(USART1);
-      usart_drv_tx(USART0, data); // Print to debug port
-    }
+  // send a test bytes on USART0 and USART1
+  static bool sent = false;
+  if (!sent) {
+    usart_drv_hello(USART0);
+    usart_drv_hello(USART1);
+    sent = true;
+  }
 }
 
 neopixel_t strips;
-
-
 
 static void dma_transfer_syn()
 {
