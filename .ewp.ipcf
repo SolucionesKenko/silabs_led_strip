@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<iarProjectConnection name="Simplicity Configurator" version="1.8">
+  <files>
+    <group name="config">
+      <path>config\sl_sleeptimer_config.h</path>
+      <path>config\emlib_core_debug_config.h</path>
+    </group>
+    <group name="autogen">
+      <group name=".slc_state">
+        <path>autogen\.slc_state\.crc_config.crc</path>
+      </group>
+      <path>autogen\gen.properties</path>
+    </group>
+    <group name="gecko_sdk_4.4.6">
+      <group name="platform">
+        <group name="common">
+          <group name="inc">
+            <path>..\..\SDKs\gecko_sdk\platform\common\inc\sl_atomic.h</path>
+            <path>..\..\SDKs\gecko_sdk\platform\common\inc\sl_assert.h</path>
+            <path>..\..\SDKs\gecko_sdk\platform\common\inc\sl_common.h</path>
+            <path>..\..\SDKs\gecko_sdk\platform\common\inc\sl_status.h</path>
+          </group>
+          <group name="src">
+            <path>..\..\SDKs\gecko_sdk\platform\common\src\sl_assert.c</path>
+          </group>
+        </group>
+        <group name="emlib">
+          <group name="src">
+            <path>..\..\SDKs\gecko_sdk\platform\emlib\src\em_core.c</path>
+          </group>
+          <group name="inc">
+            <path>..\..\SDKs\gecko_sdk\platform\emlib\inc\em_core.h</path>
+            <path>..\..\SDKs\gecko_sdk\platform\emlib\inc\em_core_generic.h</path>
+          </group>
+        </group>
+        <group name="service">
+          <group name="sleeptimer">
+            <group name="src">
+              <path>..\..\SDKs\gecko_sdk\platform\service\sleeptimer\src\sl_sleeptimer.c</path>
+              <path>..\..\SDKs\gecko_sdk\platform\service\sleeptimer\src\sli_sleeptimer_hal.h</path>
+            </group>
+            <group name="inc">
+              <path>..\..\SDKs\gecko_sdk\platform\service\sleeptimer\inc\sl_sleeptimer.h</path>
+              <path>..\..\SDKs\gecko_sdk\platform\service\sleeptimer\inc\sli_sleeptimer.h</path>
+            </group>
+          </group>
+        </group>
+      </group>
+    </group>
+  </files>
+  <SimplicityStudioMetadata>
+    <metadata>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</metadata>
+  </SimplicityStudioMetadata>
+</iarProjectConnection>

@@ -184,7 +184,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="trashed_modified_files|led_strip_gecko_cmake|led_strip_gecko_iar_cmake" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="helpers|trashed_modified_files|led_strip_gecko_cmake|led_strip_gecko_iar_cmake" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="helpers"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
