@@ -1,6 +1,7 @@
 #include "bg9x_app.h"
 #include <string.h>
 #include <stdlib.h>
+#include "bg9x_hw.h"
 
 struct bg9x_app_s {
     bg9x_t *bg9x;
@@ -35,6 +36,8 @@ bg9x_app_t *bg9x_app_create(const bg9x_at_config_t *at_cfg)
     app->netreg_state = BG9X_APP_NETREG_IDLE;
     app->netreg_started = false;
     app->netreg_reported = false;
+    bg96_hw_init();
+    bg96_hw_wake_up();
     return app;
 }
 

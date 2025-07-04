@@ -135,6 +135,20 @@
 #define _PIN                                     0
 #endif
 
+#ifndef MODEM_PWKY_PORT                         
+#define MODEM_PWKY_PORT                          gpioPortC
+#endif
+#ifndef MODEM_PWKY_PIN                          
+#define MODEM_PWKY_PIN                           6
+#endif
+
+#ifndef MODEM_STA_PORT                          
+#define MODEM_STA_PORT                           gpioPortC
+#endif
+#ifndef MODEM_STA_PIN                           
+#define MODEM_STA_PIN                            7
+#endif
+
 // [CUSTOM_PIN_NAME]$
 
 #endif // PIN_CONFIG_H
