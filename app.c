@@ -32,6 +32,9 @@
 #include "helpers/usart_drv.h"
 #include "sl_sleeptimer.h"
 
+#include "bg9x_driver/bg9x_app.h"
+#include "helpers/fifo.h"
+
 // Example config for both UARTs
 static usart_drv_config_t uart_cfg = {
     .baudrate = 115200,
@@ -52,8 +55,15 @@ static usart_drv_config_t uart_cfg = {
 #define USART1_RX_PORT   gpioPortB
 #define USART1_RX_PIN    1
 
-static void app_usart1_rx_callback(uint8_t data) {
-  usart_drv_tx(USART0, data); // Print received data to debug port
+// === BG9x Integration ===
+#define BG9X_RX_FIFO_SIZE 256
+static FIFO_HandleTypeDef bg9x_rx_fifo;
+
+static bg9x_app_t *bg9x_app = NULL;
+
+// USART1 RX handler for BG9x
+static void bg9x_usart1_rx_callback(uint8_t data) {
+    fifo_put(&bg9x_rx_fifo, data);
 }
 
 static void uart_setup(void)
@@ -82,7 +92,7 @@ static void uart_setup(void)
     usart_drv_init_async(USART1, &uart_cfg);
 
     // Enable RX interrupt for USART1
-    usart_drv_enable_rx_interrupt(USART1, app_usart1_rx_callback);
+    usart_drv_enable_rx_interrupt(USART1, bg9x_usart1_rx_callback);
 }
 
 static void uart_run(void)
@@ -159,6 +169,21 @@ void app_init(void)
   uart_setup();
   neopixel_init(&strips);
   sl_sleeptimer_delay_millisecond(10);
+
+  // === BG9x RX FIFO ===
+  fifo_init(&bg9x_rx_fifo, BG9X_RX_FIFO_SIZE);
+
+  // === BG9x AT driver config ===
+  bg9x_at_config_t at_cfg = {
+      .usart_hw = USART1,
+      .rx_fifo = {
+          .put = fifo_put,
+          .get = fifo_get,
+          .fifo = &bg9x_rx_fifo
+      },
+      .usart_tx_fn = usart_drv_tx
+  };
+  bg9x_app = bg9x_app_create(&at_cfg);
 }
 
 /***************************************************************************//**
@@ -166,10 +191,29 @@ void app_init(void)
  ******************************************************************************/
 void app_process_action(void)
 {
-  while (1)
-  {
-    uart_run();
-//    run_led();
-  }
+    static bool reg_started = false;
+    static bool reg_reported = false;
+    while (1)
+    {
+        uart_run();
+        bg9x_app_process(bg9x_app);
+        if (!reg_started) {
+            if (bg9x_app_network_register(bg9x_app) == SL_STATUS_IN_PROGRESS) {
+                reg_started = true;
+            }
+        } else if (!reg_reported) {
+            sl_status_t reg_status = bg9x_app_network_register(bg9x_app);
+            if (reg_status == SL_STATUS_OK) {
+                const char *msg = "BG9x: Network registration OK\r\n";
+                for (const char *p = msg; *p; ++p) usart_drv_tx(USART0, *p);
+                reg_reported = true;
+            } else if (reg_status == SL_STATUS_FAIL) {
+                const char *msg = "BG9x: Network registration FAIL\r\n";
+                for (const char *p = msg; *p; ++p) usart_drv_tx(USART0, *p);
+                reg_reported = true;
+            }
+        }
+        //    run_led();
+    }
 }
 
